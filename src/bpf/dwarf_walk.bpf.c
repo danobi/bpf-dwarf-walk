@@ -17,8 +17,7 @@ struct {
 	__type(value, char[MAX_STACK_SIZE]);
 } scratch SEC(".maps");
 
-/* Copy 8K bytes by default */
-const unsigned long stack_to_copy = 8192;
+const unsigned long stack_to_copy;
 
 SEC("kprobe/do_nanosleep")
 int handle_kprobe(struct pt_regs *ctx)

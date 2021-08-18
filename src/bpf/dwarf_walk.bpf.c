@@ -17,7 +17,7 @@ struct {
 	__type(value, char[MAX_STACK_SIZE]);
 } scratch SEC(".maps");
 
-const unsigned long stack_to_copy;
+const volatile unsigned long stack_to_copy;
 static char empty[MAX_STACK_SIZE] = {};
 
 SEC("kprobe/do_nanosleep")

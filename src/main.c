@@ -110,8 +110,8 @@ int main(int argc, char **argv)
 	struct dwarf_walk_bpf *skel;
 	int err;
 
-	/* Default 8K copies */
-	env.stack_to_copy = 8 << 10;
+	/* Default 4K copies */
+	env.stack_to_copy = 4 << 10;
 
 	/* Parse command line arguments */
 	err = argp_parse(&argp, argc, argv, 0, NULL, NULL);

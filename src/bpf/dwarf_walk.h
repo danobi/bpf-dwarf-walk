@@ -1,6 +1,6 @@
 #pragma once
 
-#define MAX_STACK_SIZE	(8 << 20)	/* 8MB max copy size */
+#define MAX_STACK_SIZE	(16 << 10)	/* 16KB max copy size */
 
 struct event
 {

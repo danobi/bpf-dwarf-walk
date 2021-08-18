@@ -156,9 +156,12 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	while (!exiting) {
+	while (1) {
 		if ((err = perf_buffer__poll(perf, PERF_POLL_TIMEOUT_MS)) < 0)
 			break;
+
+		if (exiting)
+			goto cleanup;
 	}
 	printf("error polling perf buffer: %d\n", err);
 

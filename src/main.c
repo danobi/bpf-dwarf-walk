@@ -94,6 +94,7 @@ static void sig_handler(int sig)
 
 static void handle_event(void *ctx, int cpu, void *data, __u32 data_sz)
 {
+	fprintf(stdout, "got %d bytes\n", data_sz);
 }
 
 static void handle_lost_events(void *ctx, int cpu, __u64 lost_cnt)

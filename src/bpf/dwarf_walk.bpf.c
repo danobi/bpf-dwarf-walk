@@ -17,8 +17,18 @@ struct {
 	__type(value, char[MAX_STACK_SIZE]);
 } scratch SEC(".maps");
 
-const volatile unsigned long stack_to_copy;
+const volatile unsigned int stack_to_copy;
 static char empty[MAX_STACK_SIZE] = {};
+
+static int try_to_copy_stack(struct event *event, void *sp, u32 size)
+{
+	long ret = bpf_probe_read_user(&event->data, size, sp);
+	if (ret)
+		return ret;
+
+	event->len = size;
+	return 0;
+}
 
 SEC("kprobe/do_nanosleep")
 int handle_kprobe(struct pt_regs *ctx)
@@ -26,11 +36,14 @@ int handle_kprobe(struct pt_regs *ctx)
 	struct task_struct *current;
 	struct pt_regs *user_regs;
 	struct event *event;
+	u32 cur_size;
 	long err = 0;
 	u32 key = 0;
+	void *sp;
 
 	current = bpf_get_current_task_btf();
 	user_regs = (struct pt_regs *)bpf_task_pt_regs(current);
+	sp = (void *)user_regs->sp;   /* Stack pointer */
 
 	/* Zero out scratch space before using */
 	bpf_map_update_elem(&scratch, &key, &empty, 0);
@@ -38,12 +51,15 @@ int handle_kprobe(struct pt_regs *ctx)
 	if (!event)
 		return 0;
 
-	event->len = stack_to_copy;
-	if (bpf_probe_read_user(&event->data, stack_to_copy, (void *)user_regs->sp))
-		return 0;
+	cur_size = stack_to_copy;
+	while (cur_size >= 128) {
+		if (!try_to_copy_stack(event, sp, stack_to_copy))
+			break;
+		cur_size /= 2;
+	}
 
 	bpf_perf_event_output(ctx, &events, BPF_F_CURRENT_CPU, event,
-			      sizeof(*event) + stack_to_copy);
+			      sizeof(*event) + cur_size);
 
 	return 0;
 }

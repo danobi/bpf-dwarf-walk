@@ -13,7 +13,7 @@
 
 static struct env {
 	bool verbose;
-	unsigned long stack_to_copy;
+	unsigned int stack_to_copy;
 } env;
 
 const char *argp_program_version = "dwarf_walk 0.0";
@@ -147,7 +147,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Failed to attach BPF skeleton\n");
 		goto cleanup;
 	}
-
 
 	pb_opts.sample_cb = handle_event;
 	pb_opts.lost_cb = handle_lost_events;

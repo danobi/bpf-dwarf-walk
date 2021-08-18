@@ -8,7 +8,7 @@
 #include "bpf/dwarf_walk.h"
 #include "dwarf_walk.skel.h"
 
-#define PERF_BUFFER_PAGES	16
+#define PERF_BUFFER_PAGES	1024
 #define PERF_POLL_TIMEOUT_MS	100
 
 static struct env {

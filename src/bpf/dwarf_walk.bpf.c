@@ -18,6 +18,7 @@ struct {
 } scratch SEC(".maps");
 
 const unsigned long stack_to_copy;
+static char empty[MAX_STACK_SIZE] = {};
 
 SEC("kprobe/do_nanosleep")
 int handle_kprobe(struct pt_regs *ctx)
@@ -31,6 +32,8 @@ int handle_kprobe(struct pt_regs *ctx)
 	current = bpf_get_current_task_btf();
 	user_regs = (struct pt_regs *)bpf_task_pt_regs(current);
 
+	/* Zero out scratch space before using */
+	bpf_map_update_elem(&scratch, &key, &empty, 0);
 	event = bpf_map_lookup_elem(&scratch, &key);
 	if (!event)
 		return 0;
